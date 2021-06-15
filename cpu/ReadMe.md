@@ -1,3 +1,3 @@
-# SaveCheckPoints 코드를 CPU로 가동시킬 수 있게 수정한 코드입니다
+# SaveCheckpoints 코드를 CPU로 가동시킬 수 있게 수정한 코드입니다
 
 * CPU로 코드를 실행 시키니 렘의 사용량이 클라우드 환경의 한계 사용량을 넘는 문제가 생겨 결과를 직접 reproduce 하지 못했습니다.
