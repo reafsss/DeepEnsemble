@@ -15,8 +15,8 @@ HP_KEYS = ('bn_l2', 'input_conv_l2', 'group_1_conv_l2', 'group_2_conv_l2',
            'group_3_conv_l2', 'dense_kernel_l2', 'dense_bias_l2')
 ```
 ## batchNormalization
-* tf.keras.layers.BatchNormalization의 새로운 version 함수 선언
-* epsilon 과 momentum은 Torch의 기본값을 사용
+* tf.keras.layers.BatchNormalization의 새로운 version 함수를 선언합니다.
+* epsilon 과 momentum은 Torch의 기본값을 사용합니다.
 ```
 BatchNormalization = functools.partial(
     tf.keras.layers.BatchNormalization,
