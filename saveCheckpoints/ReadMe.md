@@ -75,12 +75,13 @@ def main(argv):
   del argv
 ```
 ### output 디렉토리와  global seed를 선언합니다
+* output_dir에 따른 디렉토리를 작성하고 global한 random seed를 생성합니다. data_dir이 존재한다면 data_dir을 선언합니다.
 ```
-  tf.io.gfile.makedirs(FLAGS.output_dir) # 디렉토리 작성(상위 or 중간)
+  tf.io.gfile.makedirs(FLAGS.output_dir)
   logging.info('Saving checkpoints at %s', FLAGS.output_dir) # 로그 정보를 알려줌(출력X)
-  tf.random.set_seed(FLAGS.seed) # global한 random seed 생성
+  tf.random.set_seed(FLAGS.seed)
 
-  data_dir = FLAGS.data_dir # data가 저장되어있는 data_dir 선언
+  data_dir = FLAGS.data_dir
 ```
 ### GPU or TPU 환경을 설정합니다
 ```
@@ -96,17 +97,18 @@ def main(argv):
     strategy = tf.distribute.TPUStrategy(resolver)
 ```
 ### 데이터셋 환경설정을 합니다
+* tfds.core.DatasetBuilder의 dataset(=cifar10) 가져와서 정보를 저장합니다. batch_size는 64*8인 값으로 설정해주고 train_dataset_size(=50000 * 1.0), steps_per_epoch(=50000/(64*8)), Steps_per_epoch(=10000//(64*8)), num_classes(=10)을 각각 선언해줍니다.
 ```
-  ds_info = tfds.builder(FLAGS.dataset).info # tfds.core.DatasetBuilder의 dataset(=cifar10) 가져와서 정보 저장
-  batch_size = FLAGS.per_core_batch_size * FLAGS.num_cores # batch_size 설정, 64*8
-  train_dataset_size = ( # train_dataset_size 선언, 50000 * 1.0
+  ds_info = tfds.builder(FLAGS.dataset).info
+  batch_size = FLAGS.per_core_batch_size * FLAGS.num_cores
+  train_dataset_size = (
       ds_info.splits['train'].num_examples * FLAGS.train_proportion)
-  steps_per_epoch = int(train_dataset_size / batch_size) # steps_per_epoch 선언, 50000/(64*8)
+  steps_per_epoch = int(train_dataset_size / batch_size) 
   logging.info('Steps per epoch %s', steps_per_epoch)# 로그 정보를 알려줌(출력X)
   logging.info('Size of the dataset %s', ds_info.splits['train'].num_examples)# 로그 정보를 알려줌(출력X)
   logging.info('Train proportion %s', FLAGS.train_proportion)# 로그 정보를 알려줌(출력X)
-  steps_per_eval = ds_info.splits['test'].num_examples // batch_size #Steps_per_epoch 선언, 10000//(64*8)
-  num_classes = ds_info.features['label'].num_classes #num_classes 선언, 10
+  steps_per_eval = ds_info.splits['test'].num_examples // batch_size 
+  num_classes = ds_info.features['label'].num_classes
 ```
 ### aug_params를 선언합니다
 ```
