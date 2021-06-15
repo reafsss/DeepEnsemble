@@ -136,21 +136,21 @@ def _tuple_dict_fn_converter(fn, *args):
   return dict_fn
 ```
 ## Cifar Dataset를 만드는 class를 선언합니다
-* name:데이터 세트의 이름
-fingerprint_key: fingerprinting 함수를 사용하여 element id를 만드는 데 사용할 문자열을 포함하는 feature의 이름
-split: 데이터셋 분할(tfds.Split enums [TRAIN, VALIDAITON, TEST] or 소문자 문자열 이름)
-seed: random 시드
-validation_percent: validation 세트로 사용할 train 세트의 백분율
-shuffle_buffer_size: tf.data.Dataset.shuffle()에서 사용할 example의 수
-num_parallel_parser_calls: tf.data.Dataset.map()에서 전처리하는 동안 사용할 병렬 thread 수
-drop_remainder: points의 수가 배치 크기와 정확히 같은지, 같지 않을 경우 마지막 데이터 배치를 삭제할지 여부. TPU에서 실행할 경우 이 옵션은 True
-normalize: CIFAR 데이터 세트 평균 및 stddev에 의해 각 이미지를 정규화할지 여부
-try_gcs: GCS 저장 버전의 데이터 세트 파일 사용 여부
-download_data: 로드하기 전에 데이터를 다운로드할지 여부
-use_bfloat16: bfloat16 또는 float32에서 데이터를 로드할지 여부
-aug_params: data augmentation pre-processing을 위한 hyperparameters
-data_dir: 데이터를 읽고 쓰기 위한 디렉토리
-is_training: 주어진 split 이 training split인지 아닌지
+* name: 데이터 세트의 이름입니다.
+* fingerprint_key: fingerprinting 함수를 사용하여 element id를 만드는 데 사용할 문자열을 포함하는 feature의 이름입니다.
+* split: 데이터셋 분할(a custom tfds.Split or one of the tfds.Split enums [TRAIN, VALIDAITON, TEST])
+* seed: random 시드
+* validation_percent: validation 세트로 사용할 train 세트의 백분율입니다.
+* shuffle_buffer_size: tf.data.Dataset.shuffle()에서 사용할 example의 수 입니다.
+* num_parallel_parser_calls: tf.data.Dataset.map()에서 전처리하는 동안 사용할 병렬 thread 수 입니다.
+* drop_remainder: points의 수가 배치 크기와 정확히 같은지, 같지 않을 경우 마지막 데이터 배치를 삭제할지 여부. TPU에서 실행할 경우 이 옵션은 True로 설정해야 합니다.
+* normalize: CIFAR 데이터 세트 평균 및 stddev에 의해 각 이미지를 정규화할지 여부입니다.
+* try_gcs: GCS 저장 버전의 데이터 세트 파일 사용 여부입니다.
+* download_data: 로드하기 전에 데이터를 다운로드할지 여부입니다.
+* use_bfloat16: bfloat16 또는 float32에서 데이터를 로드할지 여부입니다.
+* aug_params: data augmentation pre-processing을 위한 hyperparameters 입니다.
+* data_dir: 데이터를 읽고 쓰기 위한 디렉토리입니다.
+* is_training: 주어진 split 이 training split인지 아닌지를 표현하는 True or False의 값입니다.
 ```
 class _CifarDataset(base.BaseDataset):
   def __init__(
