@@ -1,5 +1,7 @@
 # lenet Single 모델과 Deep ens 모델의 결과 비교
 * 출처: https://github.com/google/uncertainty-baselines
+
+
 |lenet|Single|Deep ens|
 |------|---|---|
 |Mnist nll|0.039138104766607285|0.041869626939296724|
