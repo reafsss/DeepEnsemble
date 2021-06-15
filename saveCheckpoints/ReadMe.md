@@ -1,6 +1,6 @@
 # WideResNet28-10 on CIFAR-10
 
-* WideResNet28-10 on CIFAR-10 단일 모델 학습과 하이퍼 파라미터 딥 앙상블을 구현할때 사용하는 체크 포인트를 저장하는데 사용되는 코드입니다.
+* WideResNet28-10 on CIFAR-10 단일 모델 학습과 하이퍼 파라미터 딥 앙상블을 구현할 때 사용하는 체크 포인트를 저장하는데 사용되는 코드입니다.
 * 출처: https://github.com/google/uncertainty-baselines/blob/master/baselines/cifar/deterministic.py#L145
 
 ## 라이브러리 import 및 flags 선언합니다
