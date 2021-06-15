@@ -1,8 +1,6 @@
 # Hyperparameter Deep Ensembles
 * "Hyperparameter Ensembles for Robustness and Uncertainty Quantification" 논문 리뷰 입니다.
 * 출처: https://github.com/google/uncertainty-baselines
----------------------------------------------------
-* 팀원: 김덕성, 박민호, 유철호, 한제현
 
 ## 범위
 * Hyperparameter Deep Ensemble
@@ -10,11 +8,11 @@
 * 데이터셋: cifar10
 
 ## 구성
-* datasets:
-* models:
-* saveCheckpoint:
-* cpu:
-* pipeLine
+* cpu: 베이스 라인 코드를 CPU로 가동시킬 수 있게 수정한 코드
+* datasets: 데이터셋을 가져오고 전처리하는데 사용된 코드들과 설명
+* models: 모델을 구축하는데 사용된 코드와 설명
+* pipeLine: HyperparameterDeepEnsembles 구현 pipleLine
+* saveCheckpoint: 단일 모델 학습과 하이퍼 파라미터 딥 앙상블을 구현할 때 사용하는 체크 포인트를 저장하는데 사용되는 코드와 설명
 
 ## HyperparameterDeepEnsembles 구현 pipeLine
 * HyperparameterDeepEnsembles 구현 pipleLine은 다음과 같습니다.
