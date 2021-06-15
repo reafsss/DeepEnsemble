@@ -1,6 +1,6 @@
 # WideResNet28-10 on CIFAR-10
 
-* WideResNet28-10 on CIFAR-10 모델 학습 + 체크 포인트 저장
+* WideResNet28-10 on CIFAR-10 단일 모델 학습과 하이퍼 파라미터 딥 앙상블을 구현할때 사용하는 체크 포인트를 저장하는데 사용되는 코드입니다.
 * 출처: https://github.com/google/uncertainty-baselines/blob/master/baselines/cifar/deterministic.py#L145
 
 ## 라이브러리 import 및 flags 선언합니다
@@ -291,7 +291,7 @@ def main(argv):
     for _ in tf.range(tf.cast(num_steps, tf.int32)): #올바른 복제본 별 데이터를 단위에 맞춰서 제공
       strategy.run(step_fn, args=(next(iterator),))
 ```
-### 학습과 검증을 진행합니다.
+### 학습과 검증을 진행합니다
 ```
   train_iterator = iter(train_dataset)
   start_time = time.time() #시작 시간 저장
