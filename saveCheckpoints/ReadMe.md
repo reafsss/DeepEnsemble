@@ -111,23 +111,30 @@ def main(argv):
   num_classes = ds_info.features['label'].num_classes
 ```
 ### aug_params를 선언합니다
+* augmix: 입력 데이터에 augmix를 수행할지 여부를 True or False로 입력해줍니다(False)
+* aug_count: augmix에서 수행할 증강 작업 수 입니다(1)
+* augmix_depth: 표본의 깊이입니다(-1)
+* augmix_prob_coeff: augmix 확률계수입니다(0.5)
+* augmix_width: augmix 폭입니다(3)
 ```
   aug_params = {
-      'augmix': FLAGS.augmix, #입력 데이터에 augmix를 수행할지 여부, False
-      'aug_count': FLAGS.aug_count, #augmix에서 수행할 증강 작업 수, 1
-      'augmix_depth': FLAGS.augmix_depth, #augmix 확률계수, 0.5
-      'augmix_prob_coeff': FLAGS.augmix_prob_coeff, #표본의 깊이, -1
-      'augmix_width': FLAGS.augmix_width, # augmix 폭, 3
+      'augmix': FLAGS.augmix, 
+      'aug_count': FLAGS.aug_count,
+      'augmix_depth': FLAGS.augmix_depth, 
+      'augmix_prob_coeff': FLAGS.augmix_prob_coeff,
+      'augmix_width': FLAGS.augmix_width, 
   }
 ```
 ### seed를 생성합니다
+* 2개의 seed를 생성합니다([1769886085, 86449935])
 ```
-  seeds = tf.random.experimental.stateless_split( #2개의 seed 생성, [1769886085, 86449935]
+  seeds = tf.random.experimental.stateless_split(
       [FLAGS.seed, FLAGS.seed + 1], 2)[:, 0]
 ```
 ### 데이터셋을 생성합니다
+* datasets.py에 선언되어 있는 get함수를 사용해 train_builder를 생성합니다. 생성된 train_builder 데이터로 train_dataset을 선언합니다. 그 후 validation_dataset을 선언하는데 이 코드에선 trainproportion이 1.0이므로 None의 값을 넣어줍니다. train_dataset을 생성했던 방법과 같이 test_dataset도 생성합니다.
 ```
-  train_builder = ub.datasets.get( #train_dataset 생성
+  train_builder = ub.datasets.get(
       FLAGS.dataset,
       data_dir=data_dir,
       download_data=FLAGS.download_data,
@@ -135,35 +142,35 @@ def main(argv):
       seed=seeds[0],
       aug_params=aug_params,
       validation_percent=1. - FLAGS.train_proportion,)
-  train_dataset = train_builder.load(batch_size=batch_size) # 생성된 train 데이터로 train_dataset 선언
-  validation_dataset = None # validation_dataset 선언, None, (trainproportion이 1.0이다)
-  steps_per_validation = 0 # steps_per_validation 선언, 0
-  clean_test_builder = ub.datasets.get( #test_dataset 생성
+  train_dataset = train_builder.load(batch_size=batch_size)
+  validation_dataset = None 
+  steps_per_validation = 0
+  clean_test_builder = ub.datasets.get(
       FLAGS.dataset,
       split=tfds.Split.TEST,
       data_dir=data_dir)
-  clean_test_dataset = clean_test_builder.load(batch_size=batch_size) # 생성된 test 데이터로 clean_test_dataset 선언
+  clean_test_dataset = clean_test_builder.load(batch_size=batch_size)
 ```
 ### 분산환경에 맞춰 다시 데이터셋 선언
+* 모델을 분산환경에 맞춰 학습시킬 것이므로 데이터셋도 분산환경에 맞춰 다시 선언해줍니다.
 ```
   train_dataset = strategy.experimental_distribute_dataset(train_dataset)
   test_datasets = {
       'clean': strategy.experimental_distribute_dataset(clean_test_dataset),
   }
-  steps_per_epoch = train_builder.num_examples // batch_size #steps_per_epoch 선언
-  steps_per_eval = clean_test_builder.num_examples // batch_size #steps_per_eval 선언
-  num_classes = 100 if FLAGS.dataset == 'cifar100' else 10 #num_classes 선언, 10
 ```
 ### 지정된 디렉토리에 저장될 요약 파일 작성
+* 지정된 디렉토리에 저장될 요약 파일을 작성하는 summary_writer 함수를 생성합니다.
 ```
-  summary_writer = tf.summary.create_file_writer( #지정된 디렉토리에 저장될 요약 파일 작성
+  summary_writer = tf.summary.create_file_writer(
       os.path.join(FLAGS.output_dir, 'summaries'))
 ```
 ### 여러 장치로 분산시켜 훈련(TPU or GPU)
+* 환경설정된 gpu or tpu 환경을 오픈하고 wide_resnet28-10 모델을 구축합니다. learningRate, decay_epochs를 각각 선언해주고 tf.keras.optimizers.schedules.LearningRateScheduler와 같은 역할을 하는 ub.schedules.WarmUpPiecewiseConstantSchedule 함수로 학습속도를 조정해줍니다. 그 후 Gradient descent optimizer를 선언해줍니다. 
 ```
-  with strategy.scope(): #환경설정된 gpu or tpu 오픈
+  with strategy.scope():
     logging.info('Building ResNet model') # 로그 정보를 알려줌(출력X)
-    model = ub.models.wide_resnet( #wide_resnet28-10 모델 구축
+    model = ub.models.wide_resnet(
         input_shape=(32, 32, 3),
         depth=28,
         width_multiplier=10,
@@ -174,45 +181,58 @@ def main(argv):
     logging.info('Model input shape: %s', model.input_shape) # 로그 정보를 알려줌(출력X)
     logging.info('Model output shape: %s', model.output_shape) # 로그 정보를 알려줌(출력X)
     logging.info('Model number of weights: %s', model.count_params()) # 로그 정보를 알려줌(출력X)
-    base_lr = FLAGS.base_learning_rate * batch_size / 128 #learningRate 선언
-    lr_decay_epochs = [(int(start_epoch_str) * FLAGS.train_epochs) // 200 #decay_epochs 선언, (60,120,180)*(200//200)
+    base_lr = FLAGS.base_learning_rate * batch_size / 128 
+    lr_decay_epochs = [(int(start_epoch_str) * FLAGS.train_epochs) // 200 
                        for start_epoch_str in FLAGS.lr_decay_epochs]
-    lr_schedule = ub.schedules.WarmUpPiecewiseConstantSchedule( #학습속도 조정(=tf.keras.optimizers.schedules.LearningRateScheduler)
+    lr_schedule = ub.schedules.WarmUpPiecewiseConstantSchedule( 
         steps_per_epoch,
         base_lr,
         decay_ratio=FLAGS.lr_decay_ratio,
         decay_epochs=lr_decay_epochs,
         warmup_epochs=FLAGS.lr_warmup_epochs)
-    optimizer = tf.keras.optimizers.SGD(lr_schedule, #Gradient descent optimizer 선언
+    optimizer = tf.keras.optimizers.SGD(lr_schedule, 
                                         momentum=1.0 - FLAGS.one_minus_momentum,
                                         nesterov=True)
-    metrics = { #평가지표 행렬 선언
-        'train/negative_log_likelihood': #train 데이터셋의 NLL
+```
+### 평가지표 행렬
+* train 데이터셋의 NLL 
+* train 데이터셋의 accuracy 
+* train 데이터셋의 loss 
+* train 데이터셋의 ece 
+* test 데이터셋의 NLL 
+* test 데이터셋의 accuracy 
+* test 데이터셋의 ece
+```
+    metrics = { 
+        'train/negative_log_likelihood':
             tf.keras.metrics.Mean(),
-        'train/accuracy': #train 데이터셋의 accuracy
+        'train/accuracy': 
             tf.keras.metrics.SparseCategoricalAccuracy(),
-        'train/loss': #train 데이터셋의 loss
+        'train/loss': 
             tf.keras.metrics.Mean(),
-        'train/ece': #train 데이터셋의 ece
+        'train/ece': 
             rm.metrics.ExpectedCalibrationError(num_bins=FLAGS.num_bins),
-        'test/negative_log_likelihood': #test 데이터셋의 NLL
+        'test/negative_log_likelihood':
             tf.keras.metrics.Mean(),
-        'test/accuracy': #test 데이터셋의 accuracy
+        'test/accuracy':
             tf.keras.metrics.SparseCategoricalAccuracy(),
-        'test/ece': #test 데이터셋의 ece
+        'test/ece':
             rm.metrics.ExpectedCalibrationError(num_bins=FLAGS.num_bins),
     }
-
-    checkpoint = tf.train.Checkpoint(model=model, optimizer=optimizer) #checkpoint에 모델과 optimizer 읽을 수 있는 값을 저장
-    latest_checkpoint = tf.train.latest_checkpoint(FLAGS.output_dir) # 최근에 저장된 checkpoint 파일의 파일 이름 저장, 없으면 false반환
-    initial_epoch = 0 #초기 epoch 선언, 모델을 돌렸을 때 중간에 멈췄다면 이어서 돌릴 수 있음
-    if latest_checkpoint: #전에 학습한 체크포인트가 있으면
-      checkpoint.restore(latest_checkpoint) #체크포인트를 latest_checkpoint로 update
+```
+### Checkpoint
+* checkpoint에 모델과 optimizer 읽을 수 있는 값을 저장합니다. latest_checkpoint에 최근에 저장된 checkpoint 파일의 파일 이름을 저장하고 없으면 false반환하고 초기 epoch 선언하는데 이는 모델을 돌렸을 때 중간에 멈췄다면 이어서 돌릴 수 있게 하기위함입니다. 전에 학습한 체크포인트가 디렉토리 안에 존재한다면 체크포인트를 latest_checkpoint로 update하고 initial_epoch을 latest_checkpoint 이후로 설정합니다.
+```
+    checkpoint = tf.train.Checkpoint(model=model, optimizer=optimizer) 
+    latest_checkpoint = tf.train.latest_checkpoint(FLAGS.output_dir) 
+    initial_epoch = 0 
+    if latest_checkpoint: 
+      checkpoint.restore(latest_checkpoint) 
       logging.info('Loaded checkpoint %s', latest_checkpoint) #로그 정보를 알려줌(출력X)
-      initial_epoch = optimizer.iterations.numpy() // steps_per_epoch #initial_epoch을 latest_checkpoint 이후로 설정
+      initial_epoch = optimizer.iterations.numpy() // steps_per_epoch
 ```
 ### Train
-* loss에 대하여 layer의 학습가능한 weight의 gradient 를 저장
+* loss에 대하여 layer의 학습가능한 weight의 gradient 를 저장하며 학습을 수행하는 함수를 선언합니다.
 ```
   @tf.function
   def train_step(iterator):
@@ -248,6 +268,7 @@ def main(argv):
       strategy.run(step_fn, args=(next(iterator),))
 ```
 ### Test
+* 검증을 수행하는 함수를 선언합니다.
 ```
   @tf.function
   def test_step(iterator, dataset_split, dataset_name, num_steps):
@@ -270,7 +291,7 @@ def main(argv):
     for _ in tf.range(tf.cast(num_steps, tf.int32)): #올바른 복제본 별 데이터를 단위에 맞춰서 제공
       strategy.run(step_fn, args=(next(iterator),))
 ```
-### 학습, 검증 진행
+### 학습과 검증을 진행합니다.
 ```
   train_iterator = iter(train_dataset)
   start_time = time.time() #시작 시간 저장
@@ -335,11 +356,12 @@ def main(argv):
       logging.info('Saved checkpoint to %s', checkpoint_name)# 로그 정보를 알려줌(출력X)
 ```
 ### final checkpoint, summary 기록
+* 모든 학습과 검증이 끝난 후 마지막 체크포인트를 저장하고 summary 로그를 기록합니다.
 ```
-  final_checkpoint_name = checkpoint.save( #fianl checkpoint 저장
+  final_checkpoint_name = checkpoint.save(
       os.path.join(FLAGS.output_dir, 'checkpoint'))
   logging.info('Saved last checkpoint to %s', final_checkpoint_name) # 로그 정보를 알려줌(출력X)
-  with summary_writer.as_default(): #summary 로그 기록
+  with summary_writer.as_default():
     hp.hparams({
         'base_learning_rate': FLAGS.base_learning_rate, #base_learning_rate, 0.1
         'one_minus_momentum': FLAGS.one_minus_momentum, #one_minus_momentum, 0.1
