@@ -1,3 +1,4 @@
+------------------------------------------------------------------
 # model-wideResidualNetwork-코드정리
 * Wide Residual Network 모델
 * 출처: https://github.com/google/uncertainty-baselines/blob/9c29b04dc4500a028ec5b9378af9881fed5f8366/uncertainty_baselines/models/wide_resnet.py#L145
