@@ -13,6 +13,7 @@
 * models: 모델을 구축하는데 사용된 코드와 설명
 * pipeLine: HyperparameterDeepEnsembles 구현 pipleLine
 * saveCheckpoint: 단일 모델 학습과 하이퍼 파라미터 딥 앙상블을 구현할 때 사용하는 체크 포인트를 저장하는데 사용되는 코드와 설명
+* test: mnist, fashion_mnist에서의 lenet Single 모델과 Deep ens(size=5) 모델의 결과
 
 ## HyperparameterDeepEnsembles 구현 pipeLine
 * HyperparameterDeepEnsembles 구현 pipleLine은 다음과 같습니다.
