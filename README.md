@@ -1,6 +1,7 @@
 # Hyperparameter Deep Ensemble
 * "Hyperparameter Ensembles for Robustness and Uncertainty Quantification" 논문 리뷰 입니다.
 * 출처: https://github.com/google/uncertainty-baselines
+* 팀원: 김덕성, 박민호, 유철호, 한제현
 
 ## 범위
 * Hyperparameter Deep Ensemble
