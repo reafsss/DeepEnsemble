@@ -106,7 +106,7 @@ def get(
 ```
 
 -----------------------------------------------------
-# dataset-cifar10 코드 정리
+# dataset-cifar10.py 코드 정리
 * CIFAR-10 or CIFAR-100  dataset builders를 반환합니다.
 * 출처: https://github.com/google/uncertainty-baselines/blob/9c29b04dc4500a028ec5b9378af9881fed5f8366/uncertainty_baselines/datasets/cifar.py
 
