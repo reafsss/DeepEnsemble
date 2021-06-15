@@ -199,29 +199,22 @@ class _CifarDataset(base.BaseDataset):
     self._adaptive_mixup = aug_params.get('adaptive_mixup', False)
     ensemble_size = aug_params.get('ensemble_size', 1)
     if self._adaptive_mixup and 'mixup_coeff' not in aug_params:
-      # Hard target in the first epoch!
       aug_params['mixup_coeff'] = tf.ones([ensemble_size, 10])
     self._aug_params = aug_params
 
   def _create_process_example_fn(self) -> base.PreProcessFn:
-
     def _example_parser(example: types.Features) -> types.Features:
-      """A pre-process function to return images in [0, 1]."""
+      #[0, 1]에서 이미지를 반환하는 사전 처리 함수입니다.
       image = example['image']
       image_dtype = tf.bfloat16 if self._use_bfloat16 else tf.float32
       use_augmix = self._aug_params.get('augmix', False)
       if self._is_training:
         image_shape = tf.shape(image)
-        # Expand the image by 2 pixels, then crop back down to 32x32.
+        # 이미지를 2픽셀 확장한 다음 32x32로 다시 자릅니다.
         image = tf.image.resize_with_crop_or_pad(
             image, image_shape[0] + 4, image_shape[1] + 4)
-        # Note that self._seed will already be shape (2,), as is required for
-        # stateless random ops, and so will per_example_step_seed.
         per_example_step_seed = tf.random.experimental.stateless_fold_in(
             self._seed, example[self._enumerate_id_key])
-        # per_example_step_seeds will be of size (num, 3).
-        # First for random_crop, second for flip, third optionally for
-        # RandAugment, and foruth optionally for Augmix.
         per_example_step_seeds = tf.random.experimental.stateless_split(
             per_example_step_seed, num=4)
         image = tf.image.stateless_random_crop(
@@ -232,7 +225,6 @@ class _CifarDataset(base.BaseDataset):
             image,
             seed=per_example_step_seeds[1])
 
-        # Only random augment for now.
         if self._aug_params.get('random_augment', False):
           count = self._aug_params['aug_count']
           augment_seeds = tf.random.experimental.stateless_split(
@@ -251,8 +243,7 @@ class _CifarDataset(base.BaseDataset):
               mean=CIFAR10_MEAN, std=CIFAR10_STD,
               seed=per_example_step_seeds[3])
 
-      # The image has values in the range [0, 1].
-      # Optionally normalize by the dataset statistics.
+      # 이미지는 [0, 1] 범위의 값입니다. 데이터 통계를 기준으로 정규화합니다.
       if not use_augmix:
         if self._normalize:
           image = augmix.normalize_convert_image(
@@ -262,7 +253,7 @@ class _CifarDataset(base.BaseDataset):
       parsed_example = example.copy()
       parsed_example['features'] = image
 
-      # Note that labels are always float32, even when images are bfloat16.
+      # 라벨은 이미지가 bfloat16인 경우에도 항상 float32입니다.
       mixup_alpha = self._aug_params.get('mixup_alpha', 0)
       label_smoothing = self._aug_params.get('label_smoothing', 0.)
       should_onehot = mixup_alpha > 0 or label_smoothing > 0
