@@ -2,7 +2,7 @@
 -----------------------------------------------------
 * Dataset을 얻는 utility 입니다.
 * 출처: https://github.com/google/uncertainty-baselines/blob/9c29b04dc4500a028ec5b9378af9881fed5f8366/uncertainty_baselines/datasets/datasets.py#L90
-## 라이브러리 import
+## 라이브러리 import 합니다
 ```
 import json
 import logging
@@ -33,7 +33,7 @@ from uncertainty_baselines.datasets.toxic_comments import CivilCommentsDataset
 from uncertainty_baselines.datasets.toxic_comments import CivilCommentsIdentitiesDataset
 from uncertainty_baselines.datasets.toxic_comments import WikipediaToxicityDataset
 ```
-## SpeechCommandsDataset 가 존재하면 import 아니면 에러처리
+## SpeechCommandsDataset 가 존재하면 import 아니면 에러처리를 합니다
 ```
 try:
   from uncertainty_baselines.datasets.speech_commands import SpeechCommandsDataset  # pylint: disable=g-import-not-at-top
@@ -41,7 +41,7 @@ except ImportError as e:
   warnings.warn(f'Skipped due to ImportError: {e}')
   SpeechCommandsDataset = None
 ```
-## 데이터셋의 이름과 import 주소를 포함한 dictionary 선언
+## 데이터셋의 이름과 import 주소를 포함한 dictionary 선언합니다
 ```
 DATASETS = {
     'cifar100': Cifar100Dataset,
@@ -74,14 +74,14 @@ DATASETS = {
     'genomics_ood': GenomicsOodDataset,
 }
 ```
-## 선언되어 있는 데이터셋들의 이름들 반환하는 함수 선언
+## 선언되어 있는 데이터셋들의 이름들 반환하는 함수 선언합니다
 ```
 def get_dataset_names() -> List[str]:
   return list(DATASETS.keys())
 ```
-## 이름을 인자로 입력해 dataset builder 클래스를 반환받는 함수 선언
-* dataset builder class의 이름과 split(a custom tfds.Split or one of the tfds.Split enums [TRAIN, VALIDAITON, TEST])을 인자로 넣어주면 dataset builder class를 반환한다
-* 분산 환경에서 작업을 한다면 "distribution_strategy.experimental_distribute_dataset(dataset)"으로 데이터셋을 로드해야 한다
+## 이름을 인자로 입력해 dataset builder 클래스를 반환받는 함수 선언합니다
+* dataset builder class의 이름과 split(a custom tfds.Split or one of the tfds.Split enums [TRAIN, VALIDAITON, TEST])을 인자로 넣어주면 dataset builder class를 반환합니다.
+* 분산 환경에서 작업을 한다면 "distribution_strategy.experimental_distribute_dataset(dataset)"으로 데이터셋을 로드해야 합니다.
 ```
 def get(
     dataset_name: str,
