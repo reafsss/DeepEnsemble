@@ -122,7 +122,7 @@ from uncertainty_baselines.datasets import augment_utils
 from uncertainty_baselines.datasets import augmix
 from uncertainty_baselines.datasets import base
 ```
-## cifar10_mean, cifar10_std의 값 선언
+## cifar10_mean, cifar10_std의 값을 선언합니다
 ```
 CIFAR10_MEAN = np.array([0.4914, 0.4822, 0.4465])
 CIFAR10_STD = np.array([0.2470, 0.2435, 0.2616])
@@ -135,8 +135,8 @@ def _tuple_dict_fn_converter(fn, *args):
     return {'features': images, 'labels': labels}
   return dict_fn
 ```
-## _CifarDataset
-name:데이터 세트의 이름
+## Cifar Dataset를 만드는 class를 선언합니다
+* name:데이터 세트의 이름
 fingerprint_key: fingerprinting 함수를 사용하여 element id를 만드는 데 사용할 문자열을 포함하는 feature의 이름
 split: 데이터셋 분할(tfds.Split enums [TRAIN, VALIDAITON, TEST] or 소문자 문자열 이름)
 seed: random 시드
@@ -290,7 +290,7 @@ class _CifarDataset(base.BaseDataset):
             augmix.mixup, batch_size, self._aug_params)
     return None
 ```
-## Cifar10Dataset을 builder class로 생성하는 class 선언
+## Cifar10Dataset을 builder class로 생성하는 class 선언합니다
 ```
 class Cifar10Dataset(_CifarDataset):
   def __init__(self, **kwargs):
@@ -299,7 +299,7 @@ class Cifar10Dataset(_CifarDataset):
         fingerprint_key='id',
         **kwargs)
 ```
-## Cifar100Dataset을  builder class로 생성하는 class 선언
+## Cifar100Dataset을 builder class로 생성하는 class 선언합니다
 ```
 class Cifar100Dataset(_CifarDataset):
   def __init__(self, **kwargs):
