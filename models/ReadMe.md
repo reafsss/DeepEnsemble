@@ -9,10 +9,20 @@ from typing import Any, Dict, Iterable, Optional
 
 import tensorflow as tf
 ```
-## 하이퍼 파라미터 인자 선언
+## 하이퍼 파라미터 인자를 선언합니다
+```
+HP_KEYS = ('bn_l2', 'input_conv_l2', 'group_1_conv_l2', 'group_2_conv_l2',
+           'group_3_conv_l2', 'dense_kernel_l2', 'dense_bias_l2')
+```
 ## batchNormalization
 * tf.keras.layers.BatchNormalization의 새로운 version 함수 선언
 * epsilon 과 momentum은 Torch의 기본값을 사용
+```
+BatchNormalization = functools.partial(
+    tf.keras.layers.BatchNormalization,
+    epsilon=1e-5,
+    momentum=0.9)
+```
 ## Conv2D 층을 생성하는 함수를 선언합니다
 ```
 def Conv2D(filters, seed=None, **kwargs):
